@@ -13,12 +13,12 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='10' fill='%231f5f8b'/%3E%3Crect x='10' y='14' width='28' height='24' rx='3' fill='none' stroke='white' stroke-width='2.5'/%3E%3Cline x1='17' y1='10' x2='17' y2='16' stroke='white' stroke-width='2.5'/%3E%3Cline x1='31' y1='10' x2='31' y2='16' stroke='white' stroke-width='2.5'/%3E%3Cline x1='10' y1='20' x2='38' y2='20' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
 <style>
-:root{--bg:#f6f5f1;--surf:#fff;--tx:#1d2330;--mu:#6b7280;--bd:#e2e0d8;--ac:#1f5f8b;--acs:#e3eef6;--today:#fff8e1;--we:#f3f1ea;--hol:#b3261e;--hols:#fbe9e7;
+:root{--bg:#f6f5f1;--surf:#fff;--tx:#1d2330;--mu:#6b7280;--bd:#e2e0d8;--ac:#1f5f8b;--acs:#e3eef6;--today:#fff8e1;--we:#ebe8dd;--wdh:#e6edf4;--wde:#b3261e;--hol:#b3261e;--hols:#fbe9e7;
 --c0:#2f6fb0;--c1:#b0572f;--c2:#7a4fb0;--c3:#2f8f6a;--c4:#b08a1f;--c5:#6b7280;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181e;--surf:#1e222a;--tx:#e8eaee;--mu:#98a0ad;--bd:#303641;--ac:#6fb1e0;--acs:#22394b;--today:#3b3519;--c0:#6fa8e0;--c1:#e0926a;--c2:#b496e0;--c3:#6fcfa5;--c4:#e0c36a;--c5:#98a0ad;--we:#1a1e25;--hol:#ff8a80;--hols:#3a2422;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#15181e;--surf:#1e222a;--tx:#e8eaee;--mu:#98a0ad;--bd:#303641;--ac:#6fb1e0;--acs:#22394b;--today:#3b3519;--c0:#6fa8e0;--c1:#e0926a;--c2:#b496e0;--c3:#6fcfa5;--c4:#e0c36a;--c5:#98a0ad;--we:#1a1e25;--hol:#ff8a80;--hols:#3a2422;color-scheme:dark}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#252c38;--surf:#2f3748;--tx:#eef1f6;--mu:#a9b3c4;--bd:#4a5468;--ac:#7cbcf0;--acs:#2d4a63;--today:#4d4524;--c0:#6fa8e0;--c1:#e0926a;--c2:#b496e0;--c3:#6fcfa5;--c4:#e0c36a;--c5:#98a0ad;--we:#222936;--hol:#ff9e94;--hols:#4a2c2b;--wdh:#202733;--wde:#ffb38a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#252c38;--surf:#2f3748;--tx:#eef1f6;--mu:#a9b3c4;--bd:#4a5468;--ac:#7cbcf0;--acs:#2d4a63;--today:#4d4524;--c0:#6fa8e0;--c1:#e0926a;--c2:#b496e0;--c3:#6fcfa5;--c4:#e0c36a;--c5:#98a0ad;--we:#222936;--hol:#ff9e94;--hols:#4a2c2b;--wdh:#202733;--wde:#ffb38a;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--bd);background:var(--surf)}
@@ -192,6 +192,16 @@ aside{align-self:stretch;max-height:none;min-height:0;overflow:auto}
 .stb button:hover{color:rgba(0,0,0,.85)}
 .stt{flex:1;border:0!important;background:transparent!important;color:#2b2b2b!important;resize:none;padding:2px 8px 8px;font:14px/1.35 "Segoe Print","Bradley Hand","Comic Sans MS",system-ui,sans-serif;outline:none;min-height:0;box-shadow:none!important;width:auto}
 .stkempty{font-size:13px;color:var(--mu);padding:8px 2px}
+
+/* v5: koyu tema ve gün başlıkları */
+.wd{background:var(--wdh)}
+.wd div{font-size:13px;font-weight:700;color:var(--tx);padding:8px 6px;letter-spacing:.3px;border-bottom:2px solid var(--ac)}
+.wd div:nth-child(n+6){color:var(--wde);background:var(--we)}
+.day{border-color:var(--bd)}
+.day:not(.o) .num:not(.tn):not(.hol){color:var(--tx);font-weight:600}
+.day.we:not(.t){background:var(--we)}
+.day.we.o{background:var(--we)}
+@media(max-width:860px){.wd div{font-size:12px;padding:6px 2px}}
 </style>
 </head>
 <body>
