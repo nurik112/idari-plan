@@ -202,6 +202,13 @@ aside{align-self:stretch;max-height:none;min-height:0;overflow:auto}
 .day.we:not(.t){background:var(--we)}
 .day.we.o{background:var(--we)}
 @media(max-width:860px){.wd div{font-size:12px;padding:6px 2px}}
+
+.nbb{display:flex;gap:6px}
+dialog#adlg{width:min(520px,94vw);max-height:80vh;overflow:auto}
+.ar{display:flex;align-items:stretch;gap:6px;margin:0 0 8px}
+.arb{flex:1;text-align:left;border:0;border-radius:3px 3px 10px 3px;background:var(--nc);color:#2b2b2b;padding:8px 10px;box-shadow:0 1px 4px rgba(0,0,0,.25);min-height:0;display:block;font:14px/1.35 system-ui,sans-serif;cursor:pointer;white-space:pre-wrap;word-break:break-word}
+.arb small{display:block;font-size:11px;opacity:.6;margin-bottom:2px}
+.arx{flex:none;width:34px;font-size:18px;padding:0}
 </style>
 </head>
 <body>
@@ -228,7 +235,7 @@ aside{align-self:stretch;max-height:none;min-height:0;overflow:auto}
 <div id="over"></div><div id="list"></div>
 <div class="tools"><button id="imp">Geçen yıldan aktar</button><button id="bk">Excel / yedek</button><button id="hb">Resmi tatiller</button><button id="prt2" class="mob">Yazdır</button><button id="inst" style="display:none">Ana ekrana ekle</button></div>
 </aside>
-<section class="nb" id="ntd"><div class="nbh"><b>Notlar</b><button id="stk-add">+ Not ekle</button></div><div id="stk"></div></section>
+<section class="nb" id="ntd"><div class="nbh"><b>Notlar</b><span class="nbb"><button id="stk-old" title="Silinen notlar">Geçmiş notlar</button><button id="stk-add">+ Not ekle</button></span></div><div id="stk"></div></section>
 </main>
 
 <dialog id="dlg"><h3 id="dt">Yeni iş</h3>
@@ -280,6 +287,10 @@ aside{align-self:stretch;max-height:none;min-height:0;overflow:auto}
 <div class="row" style="align-items:center"><button id="r-prev" aria-label="Önceki ay">‹</button><div id="r-mt" class="mt" style="flex:2"></div><button id="r-next" aria-label="Sonraki ay">›</button></div>
 <div id="r-body"></div>
 <div class="act"><button id="r-prt">Yazdır</button><button class="p" id="r-close">Kapat</button></div></dialog>
+<dialog id="adlg"><h3>Geçmiş notlar</h3>
+<div class="muted" style="font-size:13px;margin-bottom:6px">Sildiğiniz notlar burada saklanır. Birine tıklayınca yeniden not olarak açılır.</div>
+<div id="a-list"></div>
+<div class="act"><button class="p" id="a-close">Kapat</button></div></dialog>
 <div id="rpt"></div>
 <button id="fab" aria-label="Yeni iş">+</button>
 
@@ -650,10 +661,10 @@ var ST={rev:0,dirty:false,busy:false,t:null,loaded:false};
 var CK="idariplan:cache";
 
 function setStat(m,bad){var e=$("sync");e.className=bad?"bad":(/^(Kaydediliyor|Drive okunuyor|Yükleniyor|Google penceresi)/.test(m)?"busy":"");e.title=m;var t=e.querySelector(".st");if(t)t.textContent=m;}
-function snap(){return {tasks:S.tasks,done:S.done,skip:S.skip,hol:S.hol,notes:S.notes,stk:S.stk};}
+function snap(){return {tasks:S.tasks,done:S.done,skip:S.skip,hol:S.hol,notes:S.notes,stk:S.stk,arch:S.arch||[]};}
 function cacheW(pending){try{localStorage.setItem(CK,JSON.stringify({rev:ST.rev,email:G.email,pending:!!pending,data:snap()}));}catch(e){}}
 function cacheR(){try{return JSON.parse(localStorage.getItem(CK)||"null");}catch(e){return null;}}
-function applyData(d,rev){d=d||{};sup=true;S.tasks=d.tasks||[];S.done=d.done||{};S.skip=d.skip||{};S.hol=d.hol||{};S.notes=d.notes||"";S.stk=Array.isArray(d.stk)?d.stk:null;stkInit();sup=false;ST.rev=rev||0;ST.dirty=false;renderStk();render();cacheW(false);}
+function applyData(d,rev){d=d||{};sup=true;S.tasks=d.tasks||[];S.done=d.done||{};S.skip=d.skip||{};S.hol=d.hol||{};S.notes=d.notes||"";S.stk=Array.isArray(d.stk)?d.stk:null;S.arch=Array.isArray(d.arch)?d.arch:[];stkInit();sup=false;ST.rev=rev||0;ST.dirty=false;renderStk();if(window.archBtn)archBtn();render();cacheW(false);}
 function okStat(){var d=new Date();setStat((G.email||"")+" · kaydedildi "+pad(d.getHours())+":"+pad(d.getMinutes()));}
 function fmt(t){return new Date(t).toLocaleString("tr-TR",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});}
 
@@ -823,7 +834,7 @@ function srvInfo(){
 $("h-rest").onclick=async function(){
   var rid=$("h-sel").value;if(!rid)return;
   xmsg("Sürüm geri yükleniyor…");
-  try{var d=await driveRevisionData(rid);var data=d.data||d;sup=true;S.tasks=data.tasks||[];S.done=data.done||{};S.skip=data.skip||{};S.hol=data.hol||{};S.notes=data.notes||"";S.stk=Array.isArray(data.stk)?data.stk:null;stkInit();sup=false;renderStk();ST.dirty=true;await pushDrive();render();xmsg("Seçilen sürüme dönüldü (yeni bir kayıt olarak eklendi).");srvInfo();}
+  try{var d=await driveRevisionData(rid);var data=d.data||d;sup=true;S.tasks=data.tasks||[];S.done=data.done||{};S.skip=data.skip||{};S.hol=data.hol||{};S.notes=data.notes||"";S.stk=Array.isArray(data.stk)?data.stk:null;S.arch=Array.isArray(data.arch)?data.arch:[];stkInit();sup=false;renderStk();ST.dirty=true;await pushDrive();render();xmsg("Seçilen sürüme dönüldü (yeni bir kayıt olarak eklendi).");srvInfo();}
   catch(e){xmsg("Sürüm geri yüklenemedi.");}
 };
 $("d-now").onclick=async function(){xmsg("Drive'a yazılıyor…");ST.dirty=true;var ok=await pushDrive();xmsg(ok?"Drive'a kaydedildi.":"Kaydedilemedi; bağlantıyı kontrol edin.");srvInfo();};
@@ -940,7 +951,7 @@ function renderStk(force){
     var cb=document.createElement("button");cb.className="stc";cb.title="Rengi değiştir";cb.textContent="●";
     cb.onclick=function(){n.c=((n.c||0)+1)%STC.length;c.style.background=STC[n.c];stkSave();};
     var db=document.createElement("button");db.className="std";db.title="Sil";db.textContent="×";
-    db.onclick=function(){var k=S.stk.indexOf(n);S.stk.splice(k,1);stkSave();renderStk(true);toast("Not silindi.","Geri al",function(){S.stk.splice(Math.min(k,S.stk.length),0,n);stkSave();renderStk(true);});};
+    db.onclick=function(){var k=S.stk.indexOf(n),ar=null;S.stk.splice(k,1);if((n.t||"").trim()){ar={id:n.id,t:n.t,c:n.c||0,del:Date.now()};S.arch=S.arch||[];S.arch.unshift(ar);if(S.arch.length>200)S.arch.length=200;}stkSave();renderStk(true);archBtn();toast("Not silindi (Geçmiş notlar'da saklandı).","Geri al",function(){if(ar){var j=S.arch.indexOf(ar);if(j>=0)S.arch.splice(j,1);}S.stk.splice(Math.min(k,S.stk.length),0,n);stkSave();renderStk(true);archBtn();});};
     bar.appendChild(cb);bar.appendChild(db);
     var ta=document.createElement("textarea");ta.className="stt";ta.value=n.t||"";ta.placeholder="Not yaz…";
     ta.oninput=function(){n.t=ta.value;stkSave();};
@@ -948,6 +959,26 @@ function renderStk(force){
   });
 }
 $("stk-add").onclick=function(){stkInit();var n={id:"n"+Date.now(),t:"",c:S.stk.length%STC.length};S.stk.push(n);stkSave();renderStk(true);var t=$("stk").querySelectorAll("textarea");if(t.length){var l=t[t.length-1];l.focus({preventScroll:true});$("stk").scrollLeft=$("stk").scrollWidth;}};
+
+function archBtn(){var n=(S.arch||[]).length;$("stk-old").textContent=n?"Geçmiş notlar ("+n+")":"Geçmiş notlar";}
+function renderArch(){
+  var L=$("a-list");L.innerHTML="";var a=S.arch||[];
+  if(!a.length){L.innerHTML='<div class="empty">Silinmiş not yok.</div>';return;}
+  a.forEach(function(n){
+    var r=document.createElement("div");r.className="ar";r.style.setProperty("--nc",STC[(n.c||0)%STC.length]);
+    var b=document.createElement("button");b.className="arb";
+    var d=document.createElement("small");d.textContent="Silindi: "+fmt(n.del||Date.now());
+    var t=document.createElement("span");t.textContent=(n.t||"").length>160?n.t.slice(0,160)+"…":n.t;
+    b.appendChild(d);b.appendChild(t);
+    b.onclick=function(){var k=a.indexOf(n);if(k>=0)a.splice(k,1);S.stk.push({id:"n"+Date.now(),t:n.t,c:n.c||0});stkSave();renderStk(true);archBtn();$("adlg").close();toast("Not yeniden açıldı.");};
+    var x=document.createElement("button");x.className="arx";x.textContent="×";x.title="Kalıcı olarak sil";
+    x.onclick=function(){var k=a.indexOf(n);if(k>=0)a.splice(k,1);stkSave();archBtn();renderArch();};
+    r.appendChild(b);r.appendChild(x);L.appendChild(r);
+  });
+}
+$("stk-old").onclick=function(){renderArch();$("adlg").showModal();};
+$("a-close").onclick=function(){$("adlg").close();};
+archBtn();
 stkInit();renderStk();
 // ---- arama/filtre düğmesi, FAB ----
 function ftgState(){$("ftg").textContent=(QS||filt())?"Ara ●":"Ara";}
